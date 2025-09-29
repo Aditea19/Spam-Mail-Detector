@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spam Mail Detector</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght400;700&display=swap" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* Keeping the dark background */
+    background: linear-gradient(-45deg, #0d0d10, #131318, #16161c, #0d0d10);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: #f0f0f0;
+    overflow: hidden;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+/* Particle background */
+#particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    z-index: 1;
+    position: relative;
+}
+
+header h1 {
+    font-size: 3em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Keeping the white text shadow for clean contrast */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+/* Bigger mail icon */
+header h1 .mail-icon {
+    height: 3em;   
+    width: auto;
+    margin-right: 15px;
+}
+
+.container {
+    position: relative;
+    background: rgba(40, 25, 40, 0.95);
+    padding: 40px; 
+    border-radius: 20px;
+    width: 600px; 
+    max-width: 90%;
+    text-align: center;
+    z-index: 1;
+}
+
+/* Pseudo-element for symmetrical dark glow/shadow */
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 20px;
+    background: #1e1220; 
+    z-index: -1; 
+    box-shadow: 0 0 40px 10px rgba(0, 0, 0, 1); 
+    transform: scale(1.03); 
+}
+
+
+/* --- TEXTAREA GLOW REVERTED TO PINK --- */
+textarea {
+    width: 100%;
+    height: 220px; 
+    padding: 18px;
+    border-radius: 14px;
+    border: 2px solid rgba(244,140,166,0.6); /* Reverted to Pink border */
+    outline: none;
+    resize: none;
+    background: #2c1b2f;
+    color: #f0f0f0;
+    font-size: 18px;
+    box-shadow: 0 0 15px rgba(244,140,166,0.5),   /* Reverted to Pink glow */
+        inset 0 0 10px rgba(244,140,166,0.3);
+    transition: 0.3s;
+}
+
+textarea:focus {
+    border-color: #F48CA6;
+    box-shadow: 
+        0 0 20px rgba(244,140,166,0.8),
+        inset 0 0 12px rgba(244,140,166,0.4);
+}
+/* -------------------------------------- */
+
+
+/* --- BUTTON COLOR REVERTED TO PINK --- */
+button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    /* Reverted to Pink/Purple Gradient */
+    background: linear-gradient(45deg, #F48CA6, #9b5f8c); 
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px); 
+    /* Reverted to Pink Glow on Hover */
+    box-shadow: 0 0 25px rgba(244, 140, 166, 0.8), 0 8px 15px rgba(0, 0, 0, 0.5);
+}
+/* -------------------------------------- */
+
+.result {
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 18px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.spam {
+    background-color: rgba(244,140,166,0.2);
+    border: 1px solid #F48CA6;
+    color: #F48CA6;
+}
+
+.ham {
+    background-color: rgba(0,255,136,0.2);
+    border: 1px solid #00ff88;
+    color: #00ff88;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-10px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+footer {
+    margin-top: 40px;
+    font-size: 14px;
+    color: #ccc;
+    z-index: 1;
+    text-align: center;
+    position: relative;
+}
+</style>
+</head>
+<body>
+<div id="particles"></div>
+
+<header>
+    <h1>
+        <img src="{{ url_for('static', filename='email.png') }}" alt="Email" class="mail-icon">
+        Spam Mail Detector
+    </h1>
+</header>
+
+<div class="container">
+    <form action="/predict" method="post">
+        <textarea name="message" placeholder="Paste your email text here..."></textarea>
+        <br>
+        <button type="submit">Check</button>
+    </form>
+
+    {% if prediction_text %}
+        <div class="result {% if 'Ham' in prediction_text %}ham{% else %}spam{% endif %}">
+            {{ prediction_text }}
+            <p><i>Your input:</i> "{{ user_input }}"</p>
+        </div>
+    {% endif %}
+</div>
+
+<footer>
+    Spam Mail Detector – Machine Learning based email classification<br>
+    Developed by Aditi Arya
+</footer>
+
+<script>
+const canvas = document.createElement('canvas');
+canvas.id = 'particleCanvas';
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+document.getElementById('particles').appendChild(canvas);
+const ctx = canvas.getContext('2d');
+
+const particles = [];
+for(let i=0;i<100;i++){
+    // Keeping the variety of particle colors (Pink, Purple, Cyan, White)
+    const colors = [
+        'rgba(244,140,166,0.4)',  
+        'rgba(180,100,255,0.6)',  
+        'rgba(0,255,255,0.5)',    
+        'rgba(255,255,255,0.6)'   
+    ];
+    particles.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*3+1.5,
+        dx: (Math.random()-0.5)*1.5,
+        dy: (Math.random()-0.5)*1.5,
+        color: colors[Math.floor(Math.random()*colors.length)]
+    });
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2,false);
+        ctx.fillStyle=p.color;
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        if(p.x<0 || p.x>canvas.width) p.dx*=-1;
+        if(p.y<0 || p.y>canvas.height) p.dy*=-1;
+    });
+    requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('resize',()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
