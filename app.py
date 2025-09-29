@@ -16,13 +16,17 @@ def predict():
     # get message from the form
     message = request.form['message']
     # use the model to predict
-    prediction = model.predict([message])[0]
+    pred = model.predict([message])[0]
+    proba = model.predict_proba([message])[0][pred]
 
-    if prediction == 1:
-        result = "✅ This looks like a Ham (Safe) Email"
+    if pred == 1:
+        label = "✅ This looks like a Ham (Safe) Email"
+        simple_label = "Ham"
     else:
-        result = "🚨 This looks like a Spam Email!"
+        label = "🚨 This looks like a Spam Email!"
+        simple_label = "Spam"
 
+    result = f"Prediction: {label}\nProbability of being {simple_label}: {proba*100:.2f}%"
     return render_template('index.html', prediction_text=result, user_input=message)
 
 if __name__ == '__main__':

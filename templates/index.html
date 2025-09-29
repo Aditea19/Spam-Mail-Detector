@@ -188,7 +188,7 @@ footer {
 
     {% if prediction_text %}
         <div class="result {% if 'Ham' in prediction_text %}ham{% else %}spam{% endif %}">
-            {{ prediction_text }}
+            {{ prediction_text|replace('\n','<br>')|safe }}
             <p><i>Your input:</i> "{{ user_input }}"</p>
         </div>
     {% endif %}
