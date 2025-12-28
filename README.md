@@ -1,107 +1,99 @@
-# AI-Powered Document Search (RAG System)
 
-This project is a Retrieval-Augmented Generation (RAG) application that enables users to extract insights from PDF documents using Google Gemini, LangChain, and an in-memory vector store. Users can upload one or more documents and interact with them through question answering, summarization, and multi-document comparison — all processed in real time.
+# Construction Marketplace Mini RAG System
 
-Built with Streamlit, this system showcases how Large Language Models (LLMs) and vector-based retrieval can be combined to create an intuitive and powerful document analysis tool.
+## Project Overview
+This project is a Retrieval-Augmented Generation (RAG) based AI assistant built for a construction marketplace. It allows users to ask questions about internal construction documents such as policies, FAQs and specifications and receive answers strictly grounded in those documents.
+
+The system uses semantic search over document embeddings and a local open-source Large Language Model to generate accurate and explainable answers.
+
+## Tech Stack Used
+- Streamlit for chatbot interface
+- FAISS for local vector search
+- Sentence-Transformers (all-MiniLM-L6-v2) for embeddings
+- Ollama with Phi-3 (2.7B) local LLM for answer generation
+- LangChain for pipeline orchestration
+
+## Why These Models Were Chosen
+Sentence-Transformers all-MiniLM-L6-v2 was chosen because it is lightweight, fast, open-source and produces high-quality semantic embeddings.
+Phi-3 (2.7B) was chosen as a local LLM to meet the requirement of using an open-source model and to avoid any external API dependency.
+
+## Document Chunking
+The markdown documents are split using RecursiveCharacterTextSplitter with:
+Chunk size: 500
+Chunk overlap: 100
+This preserves semantic continuity while enabling efficient retrieval.
+
+## Vector Search
+All document chunks are embedded and indexed in a local FAISS vector database.
+For every user query, the top 3 most relevant chunks are retrieved using cosine similarity.
+
+## Grounded Answer Generation
+The LLM is strictly instructed to answer ONLY using the retrieved document chunks.
+If information is missing, it responds with:
+Not available in the documents.
+This prevents hallucinations and unsupported claims.
+
+## Transparency
+The application displays:
+- Retrieved document context
+- Final generated answer
+- Source document names
+
+## Evaluation Questions Used
+1. What happens if a construction project is delayed?
+2. How does Indecimal ensure payment safety for customers?
+3. What are the available construction packages and their prices per sqft?
+4. Do you provide real-time construction progress tracking?
+5. What is included in the zero-cost maintenance program?
+6. How many quality checkpoints are used during construction?
+7. What flooring wallet is offered in the Infinia package?
+8. What makes Indecimal different from typical builders?
+9. How are contractor payments released?
+10. What steel brands are used in the Pinnacle package?
+
+## Observations
+- Retrieved chunks were always relevant.
+- No hallucinations were observed.
+- Answers were concise, grounded and explainable.
+
+## How to Run
+1. Create virtual environment
+2. Install requirements using pip install -r requirements.txt
+3. Install Ollama and run ollama pull phi3
+4. Start application using streamlit run ui/streamlit_app.py
+
+## Screenshots
+All screenshots used for evaluation are placed inside the screenshots folder.
+
+## Limitations
+
+-   The system can only answer questions that are present in the provided documents.
+    
+-   It does not use internet data or external knowledge.
+    
+-   Answers are limited to the scope of the uploaded markdown documents.
+    
+-   Large documents may increase initial loading time due to embedding generation.
 
 
----
+## Flowchart
 
-## Overview
+```mermaid
 
-The application processes uploaded PDFs by extracting text, splitting it into meaningful chunks, generating embeddings, and storing them temporarily in an in-memory vector store.
-Users can then:
+flowchart TD
 
-Ask questions about any uploaded document
+A[User] --> B[Streamlit Web Interface]
 
-Generate concise summaries
+B --> C[User Question]
 
-Compare multiple PDFs side-by-side
+C --> D[FAISS Vector Database]
 
+D --> E[Top-K Relevant Document Chunks]
 
-The system is designed for correctness, transparency, and a clean user experience.
+E --> F[Retrieved Context]
 
----
+F --> G[Local LLM (Phi-3 via Ollama)]
 
-## Key Features
+G --> H[Final Grounded Answer + Sources]
 
-### PDF Upload & Processing
-- Upload one or multiple PDFs.
-- Automatic text extraction and preparation for downstream tasks.
-
-### Intelligent Chunking
-- Documents are split into smaller segments to improve retrieval accuracy.
-- Helps reduce hallucination and ensures precise answer grounding.
-
-### In-Memory Vector Search
-- Embeddings are stored in RAM using LangChain’s InMemoryVectorStore.
-- Ensures fast retrieval without requiring a persistent database.
-
-### Retrieval-Augmented Question Answering
-- Retrieves only the most relevant chunks using similarity search.
-- Google Gemini provides factual, context-grounded answers.
-
-### Dynamic Summarization
-- Automatically chooses 5–15 bullet points depending on document length.
-- Ensures summaries stay clean, structured, and to the point.
-
-### Multi-Document Comparison
-- Compares any number of uploaded documents, generating:
-  - Individual document overviews
-  - Similarities across documents
-  - Differences between documents
-  - A concluding summary
-
-### Source Transparency
-- Every answer includes the exact PDF(s) used in retrieval.
-
-### Database Reset System
-- Safely resets the vector database, cached embeddings, and session state.
-- Ensures no stale data or outdated chunks remain.
-
----
-
-## Technology Stack
-
-- Python
-- Streamlit (UI)
-- LangChain (RAG orchestration)
-- Google Generative AI Embeddings
-- Google Gemini 2.5 Flash (LLM)
-- PDF parsing utilities
-
----
-
-## How It Works
-
-1. User uploads one or more PDFs.
-2. Text is extracted and chunked into meaningful segments.
-3. Embeddings are generated using Google’s embedding model.
-4. Chunks are stored in an in-memory vectorstore.
-5. For Q&A:
-  - The retriever fetches the most relevant content.
-  - Gemini generates the answer strictly from the retrieved context.
-6. For summaries or comparison:
-  - The system processes all content and produces structured output.
-  - This architecture ensures fast, transparent, and reliable document analysis without external database dependencies.  
-
----
-
-## Use Cases
-
-- Research paper analysis
-- Policy document review
-- Corporate report examination
-- General-purpose PDF insight extraction
-- Education and academic summarization
-- Legal, healthcare, or financial document comparison
-
----
-
-## Author
-
-**Aditi Arya**  
-
----
-
-*Feel free to contribute, raise issues, or suggest improvements!*
+H --> I[Displayed to User]
