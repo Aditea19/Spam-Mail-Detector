@@ -78,10 +78,14 @@ All screenshots used for evaluation are placed inside the screenshots folder.
 
 ## Flowchart
 
+```mermaid
 flowchart TD
-    A[Christmas] -->|Get money| B(Go shopping)
-    B --> C{Let me think}
-    C -->|One| D[Laptop]
-    C -->|Two| E[iPhone]
-    C -->|Three| F[fa:fa-car Car]
-  
+A[User] --> B[Streamlit Web Interface]
+B --> C[User Question]
+C --> D[FAISS Vector Database]
+D --> E[Top-K Relevant Document Chunks]
+E --> F[Retrieved Context]
+F --> G[Local LLM Phi-3 via Ollama]
+G --> H[Final Grounded Answer and Sources]
+H --> I[Displayed to User]
+
