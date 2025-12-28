@@ -78,22 +78,12 @@ All screenshots used for evaluation are placed inside the screenshots folder.
 
 ## Flowchart
 
-```mermaid
-
 flowchart TD
-
 A[User] --> B[Streamlit Web Interface]
-
 B --> C[User Question]
-
 C --> D[FAISS Vector Database]
-
 D --> E[Top-K Relevant Document Chunks]
-
 E --> F[Retrieved Context]
-
-F --> G[Local LLM (Phi-3 via Ollama)]
-
-G --> H[Final Grounded Answer + Sources]
-
+F --> G[Local LLM Phi-3 via Ollama]
+G --> H[Final Grounded Answer and Sources]
 H --> I[Displayed to User]
